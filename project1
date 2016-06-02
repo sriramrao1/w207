@@ -133,3 +133,52 @@ for train_size in train_sizes:
 #train_sizes = [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25000]
 #accuracies = []
 #P3(train_sizes, accuracies)
+
+#def P4(): ############################  PENDING: Transformation ########
+
+### STUDENT START ###
+#print(train_sizes)
+#print(accuracies)
+
+XX = [[100],[200],[400],[800],[1600],[3200],[6400],[12800],[25000]]
+yy = np.array([accuracies])
+#YY = np.empty([len(train_sizes),len(train_sizes)] )
+#XX = np.empty([3,3])
+#YY = np.empty([3,3])
+regr = LinearRegression()
+regr.fit(XX,accuracies)
+
+X_test = [[60000]]
+print(regr.predict(X_test))
+# The coefficients
+#print('Coefficients: \n', regr.coef_)
+
+logit = LogisticRegression()
+logit.fit(XX,accuracies)
+print(logit.predict(X_test))
+
+### STUDENT END ###
+
+#P4()
+
+#def P5():  ######  PENDING: Display a few mistakes ########
+
+### STUDENT START ###
+clf = KNeighborsClassifier(1)
+# Train the model with the mini training data set of 1000 records
+clf.fit(mini_train_data, mini_train_labels)
+# Make predictions for the data in dev dataset 
+prediction = clf.predict(dev_data)
+# Compare predicted labels with actual labels
+accuracy=clf.score(dev_data, dev_labels)
+class1 = [0,1,2,3,4,5,6,7,8,9]
+cm = confusion_matrix(prediction, dev_labels, class1)
+print(cm)
+
+print(prediction)
+
+print ("Predicted Nearest Neighbor accuracy for k value of "+str(k)+" is "+str(accuracy))
+    
+### STUDENT END ###
+
+#P5()
