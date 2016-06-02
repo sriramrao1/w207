@@ -45,27 +45,34 @@ mini_train_data, mini_train_labels = X[:1000], Y[:1000]
 
 ################## def P1(num_examples=10): #################
 ### STUDENT START ###
+# set up the plot figure with gray colormap and size of 8 inches X 8 inches
 plt.rc('image', cmap='gray')
 plt.rc('figure', figsize=[8,8])
-#img = mpimg.imread('stinkbug.png')
 fig = plt.figure()
 
+# get a list with indices of data with labels 0 through 9
 gridsz = 10
 gridsq = gridsz * gridsz
 
-mat2 = np.reshape(test_data[3200], (28, 28))
+indexdata = np.empty(gridsq)
 
+for i in range(0, gridsz):
+    count = 0
+    while(count < gridsz):
+        r = np.random.randint(0, 60000)
+        if ((int(train_labels[r])) == i):
+            indexdata[((i*10)+count)]=r
+            count=count+1
+
+# plot a 10 X 10 grid with image data to visualize 10 examples of each digit
 for i in range(0, gridsq):
     ax = plt.subplot(gridsz, gridsz, i+1) 
     ax.set_axis_off()
-    ax.imshow(mat2)
+    mat = np.reshape(train_data[(indexdata[i])], (28, 28))
+    ax.imshow(mat)
     #am.imshow(img)
 
 plt.show()
-
-print(int(test_labels[3200]))
-
-
 ### STUDENT END ###
 
 #P1(10)
