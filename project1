@@ -102,3 +102,34 @@ print("Classification report for classifier %s:\n%s\n"% (clf, classification_rep
 #k_values = [1, 3, 5, 7, 9]
 #P2(k_values)
 
+#####################def P3(train_sizes, accuracies): #####################
+### STUDENT START ###
+train_sizes = [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25000]
+clf = KNeighborsClassifier(1)
+accuracies = []
+
+for train_size in train_sizes:
+    # Train the model with the mini training data set of 1000 records
+    shuffle = np.random.permutation(np.arange(train_data.shape[0]))
+    p3_data, p3_label = train_data[shuffle], train_labels[shuffle]
+
+    p3_data, p3_label = p3_data[:train_size], p3_label[:train_size]
+    
+    starttime = time.time()
+    clf.fit(p3_data, p3_label)
+    # Make predictions for the data in dev dataset 
+    prediction = clf.predict(dev_data)
+    endtime = time.time()
+    # Compare predicted labels with actual labels
+    accuracy=clf.score(dev_data, dev_labels)
+    accuracies.append(accuracy)
+    print ("Predicted Nearest Neighbor accuracy for a training size of "+str(train_size)+" records is "+str(accuracy))
+    print ("Time needed for prediction for a training size of "+str(train_size)+" records is "+str(endtime-starttime)+" seconds")
+
+#print(train_sizes)
+#print(accuracies)
+### STUDENT END ###
+
+#train_sizes = [100, 200, 400, 800, 1600, 3200, 6400, 12800, 25000]
+#accuracies = []
+#P3(train_sizes, accuracies)
