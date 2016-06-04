@@ -182,3 +182,74 @@ print ("Predicted Nearest Neighbor accuracy for k value of "+str(k)+" is "+str(a
 ### STUDENT END ###
 
 #P5()
+
+#def P7():
+
+### STUDENT START : PENDING - Multinomial transformation###
+
+BNBtrain_data = Binarizer(0.1).transform(train_data)
+BNBdev_data = Binarizer(0.1).transform(dev_data)
+BNBclf = BernoulliNB()
+BNBclf.fit(BNBtrain_data, train_labels)
+BNBprediction = BNBclf.predict(BNBdev_data)
+# Compare predicted labels with actual labels
+BNBaccuracy = BNBclf.score(BNBdev_data, dev_labels)
+print("Predicted Nearest Neighbor accuracy for BernoulliNB is "+str(BNBaccuracy))
+
+MNBtrain_data = train_data
+binplace = np.digitize(MNBtrain_data, bins=[0.0, 0.001, 0.999, 1.0])
+MNBtrain_data[np.where(binplace == 1)] = 0
+MNBtrain_data[np.where(binplace == 2)] = 1
+MNBtrain_data[np.where(binplace == 3)] = 2
+
+MNBdev_data = dev_data
+binplace1 = np.digitize(MNBdev_data, bins=[0.0, 0.001, 0.999, 1.0])
+MNBdev_data[np.where(binplace1 == 1)] = 0
+MNBdev_data[np.where(binplace1 == 2)] = 1
+MNBdev_data[np.where(binplace1 == 3)] = 2
+
+        
+MNBclf = MultinomialNB()
+MNBclf.fit(MNBtrain_data, train_labels)
+MNBprediction = MNBclf.predict(MNBtrain_data)
+# Compare predicted labels with actual labels
+MNBaccuracy = MNBclf.score(MNBtrain_data, train_labels)
+print("Predicted Nearest Neighbor accuracy for MultinomialNB is "+str(MNBaccuracy))
+#train_data[34347][0]
+#MNBtrain_data[34347][0]        
+### STUDENT END ###
+
+#P7()
+
+#def P8(alphas): #### What is GridSearchCV - why are we doing this?####
+
+### STUDENT START ###
+
+parameters = [{'alpha':[0.0, 0.0001, 0.001, 0.01, 0.1, 0.5, 1.0, 2.0, 10.0]}]
+
+CVclf = GridSearchCV(BernoulliNB(binarize=0.0, class_prior=None, fit_prior=True), parameters, cv=10, scoring='f1_weighted')
+CVclf.fit(train_data,train_labels) 
+
+print(CVclf.best_estimator_)
+print(CVclf.best_score_)
+print(CVclf.best_params_)
+print(CVclf.grid_scores_)
+
+
+### STUDENT END ###
+
+#def P9() ##############################################################:
+
+### STUDENT END ###
+GNBclf = GaussianNB()
+param = GNBclf.fit(train_data, train_labels)
+GNBprediction = GNBclf.predict(dev_data)
+# Compare predicted labels with actual labels
+GNBaccuracy = GNBclf.score(dev_data, dev_labels)
+print("Predicted Nearest Neighbor accuracy for GaussianNB is "+str(GNBaccuracy))
+print(param)
+
+
+### STUDENT END ###
+
+#gnb = P9()
