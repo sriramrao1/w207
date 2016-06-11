@@ -253,3 +253,39 @@ print(param)
 ### STUDENT END ###
 
 #gnb = P9()
+
+#def P10(num_examples)######################################:
+
+### STUDENT START ###
+BNBtrain_data = Binarizer(0.1).transform(train_data)
+BNBdev_data = Binarizer(0.1).transform(dev_data)
+BNBclf = BernoulliNB()
+BNBclf.fit(BNBtrain_data, train_labels)
+
+#print('feature log shape: ', BNBclf.feature_log_prob_.shape[1])
+#print('feature log array: ', BNBclf.feature_log_prob_[0][0])
+
+num_features = 784
+num_samples = 20
+num_digits = 10
+gen_data = np.zeros(((num_samples*num_digits), num_features))
+
+for digit in range (0, num_digits):
+    for sample in range (0, num_samples):
+        for feature in range (0, num_features):
+            continuewithfeature = True
+            prob = np.exp(BNBclf.feature_log_prob_[digit][feature])
+            while(continuewithfeature):
+                r = np.random.rand()
+                if(r < prob):
+                    gen_data[((digit*num_samples)+sample)][feature] = r
+                    continuewithfeature = False
+
+        ax = plt.subplot(num_digits, num_samples, (((digit*num_samples)+sample)+1))
+        ax.set_axis_off()
+        mat = np.reshape(gen_data[((digit*num_samples)+sample)], (28, 28))
+        ax.imshow(mat)
+
+### STUDENT END ###
+
+#P10(20)
