@@ -242,6 +242,30 @@ prediction = clf.predict(dev_data)
 accuracy = clf.score(dev_data, dev_labels)
 print ("Predicted Nearest Neighbor accuracy with preprocessing just training data is "+str(accuracy))
 
+#preprocess the dev data
+blurdev_data = dev_data
+for i in range(0, dev_data.shape[0]):
+    blurdev_data[i] = funcgaussianblur(dev_data[i])
+
+clf = KNeighborsClassifier()
+clf.fit(train_data, train_labels)
+# Make predictions for the data in dev dataset 
+prediction = clf.predict(blurdev_data)
+    
+# Compare predicted labels with actual labels
+accuracy = clf.score(blurdev_data, dev_labels)
+print ("Predicted Nearest Neighbor accuracy with preprocessing just dev data is "+str(accuracy))
+
+#preprocess both dev and training data
+clf = KNeighborsClassifier()
+clf.fit(blurtrain_data, train_labels)
+# Make predictions for the data in dev dataset 
+prediction = clf.predict(blurdev_data)
+    
+# Compare predicted labels with actual labels
+accuracy = clf.score(blurdev_data, dev_labels)
+print ("Predicted Nearest Neighbor accuracy with preprocessing both training and dev data is "+str(accuracy))
+
 
 ### STUDENT END ###
 
