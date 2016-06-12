@@ -174,11 +174,26 @@ accuracy=clf.score(dev_data, dev_labels)
 class1 = [0,1,2,3,4,5,6,7,8,9]
 cm = confusion_matrix(prediction, dev_labels, class1)
 print(cm)
-
-print(prediction)
-
 print ("Predicted Nearest Neighbor accuracy for k value of "+str(k)+" is "+str(accuracy))
-    
+
+num_display = 10
+count = 0
+k = 0
+indexdata1 = np.empty(gridsq)
+
+while ((count < num_display) and (k<len(prediction))):
+    if(prediction[k] != dev_labels[k]):
+        if(int(prediction[k]) == 4):
+            indexdata1[count]=k
+            count = count+1
+    k = k+1
+            
+for i in range(0, num_display):
+    ax = plt.subplot(1, num_display, i+1) 
+    ax.set_axis_off()
+    mat = np.reshape(dev_data[(indexdata1[i])], (28, 28))
+    ax.imshow(mat)
+
 ### STUDENT END ###
 
 #P5()
