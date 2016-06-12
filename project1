@@ -183,6 +183,70 @@ print ("Predicted Nearest Neighbor accuracy for k value of "+str(k)+" is "+str(a
 
 #P5()
 
+#def P6():
+    
+### STUDENT START ###
+
+def funcgaussianblur(datavector):
+    datamat = np.reshape(datavector, (28, 28))
+    blurdatamat = np.reshape(datavector, (28, 28))
+    for rowindex in range(0,27):
+        for colindex in range(0,27):
+            val = 0
+            n = 0
+            # Get the values from the previous row
+            if (rowindex-1)>=0:
+                if(colindex-1)>=0:
+                    val = val + datamat[rowindex-1][colindex-1]
+                    n=n+1
+                val = val + datamat[rowindex-1][colindex]
+                n=n+1
+                if(colindex+1)<=27:
+                    val = val + datamat[rowindex-1][colindex+1]
+                    n=n+1
+            # Add the values from the current row
+            if(colindex-1)>=0:
+                val = val + datamat[rowindex][colindex-1]
+                n=n+1
+            val = val + datamat[rowindex][colindex]
+            n=n+1
+            if(colindex+1)<=27:
+                val = val + datamat[rowindex][colindex+1]
+                n=n+1
+            # Get the values from the next row
+            if (rowindex+1)<=27:
+                if(colindex-1)>=0:
+                    val = val + datamat[rowindex+1][colindex-1]
+                    n=n+1
+                val = val + datamat[rowindex+1][colindex]
+                n=n+1
+                if(colindex+1)<=27:
+                    val = val + datamat[rowindex+1][colindex+1]
+                    n=n+1
+            blurdatamat[rowindex][colindex] = val/n
+    blurdatavector = np.reshape(blurdatamat, (1, 784))
+    #print(blurdatavector)
+    return blurdatavector
+  
+#preprocess the training data
+blurtrain_data = train_data
+for i in range(0, train_data.shape[0]):
+    blurtrain_data[i] = funcgaussianblur(train_data[i])
+
+clf = KNeighborsClassifier()
+clf.fit(blurtrain_data, train_labels)
+# Make predictions for the data in dev dataset 
+prediction = clf.predict(dev_data)
+    
+# Compare predicted labels with actual labels
+accuracy = clf.score(dev_data, dev_labels)
+print ("Predicted Nearest Neighbor accuracy with preprocessing just training data is "+str(accuracy))
+
+
+### STUDENT END ###
+
+#P6()
+
 #def P7():
 
 ### STUDENT START : PENDING - Multinomial transformation###
