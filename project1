@@ -391,4 +391,33 @@ for digit in range (0, num_digits):
 
 ### STUDENT END ###
 
-#P10(20)
+#P10(20)######################################################
+
+#def P11(buckets, correct, total)#############################:
+    
+### STUDENT START ###
+buckets = [0.5, 0.9, 0.999, 0.99999, 0.9999999, 0.999999999, 0.99999999999, 0.9999999999999, 1.0]
+correct = [0 for i in buckets]
+total = [0 for i in buckets]
+
+#print(total)
+
+BNBclf = BernoulliNB(alpha = 0.9)
+BNBclf.fit(BNBtrain_data, train_labels)
+
+for num in range (0, dev_data.shape[0]):
+    predicteddigit = int(BNBclf.predict(dev_data[num]))
+    posteriorprob = BNBclf.predict_proba(dev_data[num])
+    bucketindex = np.digitize(posteriorprob[0][predicteddigit], buckets, right=False)
+   
+    total[bucketindex-1] = (total[bucketindex-1])+1
+    if (dev_labels[num] == predicteddigit):
+        correct[bucketindex-1] = (correct[bucketindex-1])+1
+    
+for i in range(len(buckets)):
+    accuracy = 0.0
+    if (total[i] > 0): 
+        accuracy = correct[i] / total[i]
+    print('p(pred) <= %.13f    total = %3d    accuracy = %.3f' %(buckets[i], total[i], accuracy))
+                
+### STUDENT END ##############################################
