@@ -1,0 +1,130 @@
+# This tells matplotlib not to try opening a new window for each plot.
+%matplotlib inline
+
+# General libraries.
+import re
+import numpy as np
+import matplotlib.pyplot as plt
+import operator.add as 
+
+# SK-learn libraries for learning.
+from sklearn.pipeline import Pipeline
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import BernoulliNB
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.grid_search import GridSearchCV
+
+# SK-learn libraries for evaluation.
+from sklearn.metrics import confusion_matrix
+from sklearn import metrics
+from sklearn.metrics import classification_report
+
+# SK-learn library for importing the newsgroup data.
+from sklearn.datasets import fetch_20newsgroups
+
+# SK-learn libraries for feature extraction from text.
+from sklearn.feature_extraction.text import *
+------------------------------------------------------------
+categories = ['alt.atheism', 'talk.religion.misc', 'comp.graphics', 'sci.space']
+newsgroups_train = fetch_20newsgroups(subset='train',
+                                      remove=('headers', 'footers', 'quotes'),
+                                      categories=categories)
+newsgroups_test = fetch_20newsgroups(subset='test',
+                                     remove=('headers', 'footers', 'quotes'),
+                                     categories=categories)
+
+num_test = len(newsgroups_test.target)
+test_data, test_labels = newsgroups_test.data[int(num_test/2):], newsgroups_test.target[int(num_test/2):]
+dev_data, dev_labels = newsgroups_test.data[:int(num_test/2)], newsgroups_test.target[:int(num_test/2)]
+train_data, train_labels = newsgroups_train.data, newsgroups_train.target
+
+print('training label shape:', train_labels.shape)
+print('test label shape:', test_labels.shape) 
+print('dev label shape:', dev_labels.shape) 
+print('labels names:', newsgroups_train.target_names) 
+
+---------------------------------------------------
+#def P1(num_examples=5):
+### STUDENT START ###
+for i in range (1,5):
+    print(i, " - Chat Message Content")
+    print(train_data[i])
+    if (train_labels[i] == 0):
+        print('Label is alt.atheism');
+    if (train_labels[i] == 1):
+        print('Label is comp.graphics');
+    if (train_labels[i] == 2):
+        print('Label is sci.space');
+    if (train_labels[i] == 3):
+        print('Label is talk.religion.misc');
+    print("-------------------------------------------------------------------------------")
+### STUDENT END ###
+#P1(2)
+------------------------------------------------------
+#def P2():
+### STUDENT START ###
+#def add(a, b):
+#    return int(a) + int(b)
+
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(train_data)
+numsamples = X.shape[0]
+vocabsize = X.shape[1]
+nonzerofeatures = X.nnz
+#print("P2 a - ",X.shape)
+#vocab = vectorizer.vocabulary_
+#vocabsize = len(vocab)
+# a. What is the size of the vocabulary?
+#print("P2 a - Size of the vocabulary is", vocabsize)
+print("P2 a - Size of the vocabulary is", vocabsize)
+print("P2 a - nonzerofeatures is", nonzerofeatures)
+
+# a. What is the average number of non-zero features per example?
+print("P2 a - Average number of non-zero features per example is", nonzerofeatures/numsamples)
+
+# a.  What fraction of the entries in the matrix are non-zero? ---- VALIDATE if nnz is for the entire matrix
+print("P2 a - fraction of the entries in the matrix that are non-zero is", (nonzerofeatures/numsamples)/vocabsize)
+
+# b. What are the 0th and last feature strings (in alphabetical order)? 
+# Hint: use the vectorizer's get_feature_names function.
+featurename = vectorizer.get_feature_names();
+print("P2 b - First Feature Name", featurename[0])
+print("P2 b - Last Feature Name", featurename[len(featurename)-1])
+
+# c. Now what's the average number of non-zero features per example? ---- PENDING
+p2cvocab = ["atheism", "graphics", "space", "religion"]
+p2cvectorizer = CountVectorizer(min_df=1, vocabulary=p2cvocab)
+p2cX = p2cvectorizer.fit_transform(train_data)
+p2cnumsamples = p2cX.shape[0]
+p2cvocabsize = p2cX.shape[1]
+p2cnonzerofeatures = p2cX.nnz
+#p2vocabsize = len(p2vocab)
+print("P2 c - Average number of non-zero features per example is", p2cnonzerofeatures/p2cnumsamples)
+
+# d. What size vocabulary does this yield?
+p2dvectorizer = CountVectorizer(ngram_range=(1, 2), token_pattern=r'\b\w+\b', min_df=1)
+#analyze = p2dvectorizer.build_analyzer()
+p2dX = p2dvectorizer.fit_transform(train_data)
+p2dvocabsize = p2dX.shape[1]
+print("P2 d - Size of the vocabulary is", p2dvocabsize)
+
+# e.  Use the "min_df" argument to prune words that appear in fewer than 10 documents. What size vocabulary does this yield?
+p2evectorizer = CountVectorizer(min_df=10)
+p2eX = p2evectorizer.fit_transform(train_data)
+p2evocabsize = p2eX.shape[1]
+#p2evocab = p2evectorizer.vocabulary_
+#p2evocabsize = len(p2evocab)
+print("P2 e - Size of the vocabulary is", p2evocabsize)
+
+# f. Using the standard CountVectorizer, what fraction of the words in the dev data are missing from the vocabulary? 
+# Hint: build a vocabulary for both train and dev and look at the size of the difference.
+p2fvectorizer = CountVectorizer()
+p2fX = p2fvectorizer.fit_transform(dev_data)
+p2fvocabsize = p2fX.shape[1]
+
+print("P2 f - fraction of dev data missing from the vocab", (p2fvocabsize-vocabsize)/vocabsize)
+### STUDENT END ###
+#P2()
+--------------------------------------------------------------
+
