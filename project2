@@ -127,4 +127,49 @@ print("P2 f - fraction of dev data missing from the vocab", (p2fvocabsize-vocabs
 ### STUDENT END ###
 #P2()
 --------------------------------------------------------------
+#def P3():
+### STUDENT START ###
+p3vectorizer = CountVectorizer()
+p3train_data = p3vectorizer.fit_transform(train_data)
 
+# Use the same vectorizer as the training data, so that the same vocabulary is used
+p3dev_data = p3vectorizer.transform(dev_data)
+
+# Print the shape attributes to check if the same vocabulary is used
+#print(p3train_data.shape)
+#print(p3dev_data.shape)
+
+#print('training label shape:', train_labels.shape)
+#print('test label shape:', test_labels.shape) 
+#print('dev label shape:', dev_labels.shape) 
+#print(train_labels)
+
+accuracy = []
+for i in range (1, 10):
+    KNclf = KNeighborsClassifier(k=i)
+# Train the model with the training data set 
+    KNclf.fit(p3train_data, train_labels)
+# Make predictions for the data in dev dataset 
+    prediction = KNclf.predict(p3dev_data)
+# Compare predicted labels with actual labels
+    accuracy.append(KNclf.score(p3dev_data, dev_labels))
+#print("P3 accuracy ",accuracy)
+
+# Train the MultinomialNB classifier with the training data
+MNBclf = MultinomialNB()
+MNBclf.fit(p3train_data, train_labels)
+MNBprediction = MNBclf.predict(p3dev_data)
+# Compare predicted labels with actual labels
+MNBaccuracy = MNBclf.score(p3dev_data, dev_labels)
+print("Predicted accuracy for MultinomialNB is "+str(MNBaccuracy))
+
+# Fit a logistic regression model and find the optimal value for the regularization strength C using l2 regularization
+LRclf = LogisticRegression()
+LRclf.fit(p3train_data, train_labels)
+LRprediction = LRclf.predict(p3dev_data)
+# Compare predicted labels with actual labels
+LRaccuracy = LRclf.score(p3dev_data, dev_labels)
+print("Predicted accuracy for Logistic Regression is "+str(LRaccuracy))
+### STUDENT END ###
+#P3()
+------------------------------------------------------------
