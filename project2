@@ -215,19 +215,21 @@ print(LRclf.best_params_)
 ------------------------------------------------------------
 #def P4():
 ### STUDENT START ###
+p4vectorizer = CountVectorizer()
+p4train_data = p4vectorizer.fit_transform(train_data)
 
-p4LRclf = LogisticRegression(C=0.1, penalty='l2', class_weight=None, dual=False, fit_intercept=True,
-          intercept_scaling=1, max_iter=100, multi_class='ovr', n_jobs=1,
-          random_state=None, solver='liblinear', tol=0.0001,
-          verbose=0, warm_start=False)
-p4LRclf.fit(p3train_data, train_labels) 
+# Use the same vectorizer as the training data, so that the same vocabulary is used
+p4dev_data = p4vectorizer.transform(dev_data)
+
+p4LRclf = LogisticRegression(C=0.1, penalty='l2')
+p4LRclf.fit(p4train_data, train_labels) 
 weightvectorC1 = list(p4LRclf.coef_[0])
 weightvectorC2 = list(p4LRclf.coef_[1])
 weightvectorC3 = list(p4LRclf.coef_[2])
 weightvectorC4 = list(p4LRclf.coef_[3])
-print("Class is ", p4LRclf.classes_)
+#print("Class is ", p4LRclf.classes_)
 
-featurenames = list(p3vectorizer.get_feature_names())
+featurenames = list(p4vectorizer.get_feature_names())
 max_val = []
 max_idx = []
 classfeatures = []
@@ -281,15 +283,87 @@ for i in range(0, 20):
         #print(max_idx[i])
         #print(classfeatures[i])
         
+print("========= Class Weights for Unigram ======== ")
+print(classf)
 
-print("Class Weights ",classf)
+######## For bigram
+p4vectorizer = CountVectorizer(ngram_range=(2,2))
+p4train_data = p4vectorizer.fit_transform(train_data)
+
+# Use the same vectorizer as the training data, so that the same vocabulary is used
+p4dev_data = p4vectorizer.transform(dev_data)
+
+p4LRclf = LogisticRegression(C=0.1, penalty='l2')
+p4LRclf.fit(p4train_data, train_labels) 
+weightvectorC1 = list(p4LRclf.coef_[0])
+weightvectorC2 = list(p4LRclf.coef_[1])
+weightvectorC3 = list(p4LRclf.coef_[2])
+weightvectorC4 = list(p4LRclf.coef_[3])
+#print("Class is ", p4LRclf.classes_)
+
+featurenames = list(p4vectorizer.get_feature_names())
+max_val = []
+max_idx = []
+classfeatures = []
+w, h = 5, 20 
+classf = [[0 for x in range(w)] for y in range(h)] 
+#classf = np.zeros((20, 5))
+#print("Class Weights for alt.atheism")
+for i in range(0, 20):
+    if (i<5):
+        
+        max_val.append(max(weightvectorC1))
+        max_idx.append(weightvectorC1.index(max_val[i]))
+        classfeatures.append(featurenames[max_idx[i]])
+        weightvectorC1.pop(int(max_idx[i]))
+        classf[i][0] = classfeatures[i]
+        classf[i][1] = max_val[i]
+        #print(max_val[i])
+        #print(max_idx[i])
+        #print(classfeatures[i])
+    
+    if(i>=5 and i<10):
+        max_val.append(max(weightvectorC2))
+        max_idx.append(weightvectorC2.index(max_val[i]))
+        classfeatures.append(featurenames[max_idx[i]])
+        weightvectorC2.pop(int(max_idx[i]))
+        classf[i][0] = classfeatures[i]
+        classf[i][2] = max_val[i]
+        #print(max_val[i])
+        #print(max_idx[i])
+        #print(classfeatures[i])
+        
+    if(i>=10 and i<15):
+        max_val.append(max(weightvectorC3))
+        max_idx.append(weightvectorC3.index(max_val[i]))
+        classfeatures.append(featurenames[max_idx[i]])
+        weightvectorC3.pop(int(max_idx[i]))
+        classf[i][0] = classfeatures[i]
+        classf[i][3] = max_val[i]
+        #print(max_val[i])
+        #print(max_idx[i])
+        #print(classfeatures[i])
+         
+    if(i>=15):
+        max_val.append(max(weightvectorC4))
+        max_idx.append(weightvectorC4.index(max_val[i]))
+        classfeatures.append(featurenames[max_idx[i]])
+        weightvectorC4.pop(int(max_idx[i]))
+        classf[i][0] = classfeatures[i]
+        classf[i][4] = max_val[i]
+        #print(max_val[i])
+        #print(max_idx[i])
+        #print(classfeatures[i])
+        
+print("========= Class Weights for Bigram ======== ")
+print(classf)
 #for i in range(16, 20):
     
     
 #alt.atheism', 'comp.graphics', 'sci.space', 'talk.religion.misc
-p4LRprediction = p4LRclf.predict(p3dev_data)
+p4LRprediction = p4LRclf.predict(p4dev_data)
 # Compare predicted labels with actual labels
-p4LRaccuracy = p4LRclf.score(p3dev_data, dev_labels)
+p4LRaccuracy = p4LRclf.score(p4dev_data, dev_labels)
 #print("Predicted accuracy for Logistic Regression is "+str(p4LRaccuracy))
 
 ### STUDENT END ###
@@ -352,4 +426,141 @@ print("P5 F1 score for Logistic Regression algorithm with preprocessor is ", met
 ### STUDENT END ###
 #P5()
 ---------------------------------------------------
+def getNonZero(coef):
+    nz_idx = []
+    for i in range(0, len(coef[0])):
+        if ((coef[0][i] > 0) or (coef[1][i] > 0) or (coef[2][i] > 0) or (coef[3][i] > 0)):
+            nz_idx.append(i)
+    return nz_idx
 
+def reduceVocab(vocab, coef):
+    newvocabkey = []
+#    newvocabkey= { k:v for k,v in iter(vocab.keys()) if v in coef }
+    for k,v in iter(vocab.items()):
+        if v in coef:
+            newvocabkey.append(k)
+#   iter(d.items())
+#    iter(vocab.items)
+    #vocablist = list(vocab.values)
+#    for i in range(0, len(coef)):
+#        if vocab.values[i] = coef
+#        newvocabkey.append
+#    c = dict(zip(['one', 'two', 'three'], [1, 2, 3]))
+#    newvocab
+    newvocab = dict(zip(newvocabkey, coef))
+    return newvocab
+    
+
+def P6(cvalues):
+    # Keep this random seed here to make comparison easier.
+    np.random.seed(0)
+
+    ### STUDENT START ###
+    p6vectorizer = CountVectorizer()
+    p6train_data = p6vectorizer.fit_transform(train_data)
+
+    # Use the same vectorizer as the training data, so that the same vocabulary is used
+    p6dev_data = p6vectorizer.transform(dev_data)
+
+    p6LRclf = LogisticRegression(C=0.1, penalty='l2')
+    p6LRclf.fit(p6train_data,train_labels)
+    p6LRprediction = p6LRclf.predict(p6dev_data)
+
+    nonzero_idx = getNonZero(p6LRclf.coef_)
+    print("Number of non-zero coefficients with L2 is ", len(nonzero_idx))
+    
+    p6LRclf = LogisticRegression(C=0.1, penalty='l1')
+    p6LRclf.fit(p6train_data,train_labels)
+    p6LRprediction = p6LRclf.predict(p6dev_data)
+
+    nonzero_idx = getNonZero(p6LRclf.coef_)
+    print("Number of non-zero coefficients with L1 is ",len(nonzero_idx))
+
+    #vocab = p6vectorizer.vocabulary_
+    
+    vocabsize = []
+    f1score = []
+    
+    for c in cvalues:
+        p6vect = CountVectorizer()
+        p6train_data = p6vect.fit_transform(train_data)
+        
+        # Train LogReg with L1 and get non-zero coeffs 
+        p6LRclf = LogisticRegression(penalty='l1', C=c, tol=0.01)
+        p6LRclf.fit(p6train_data, train_labels)
+        nonzero_idx = getNonZero(p6LRclf.coef_)
+        vocabsize.append(len(nonzero_idx))
+                
+        # Prune vocabulary and train new LogReg with L2
+        #print("vocab ", p6vect.vocabulary_)
+        p6vect.vocabulary_ = { k:v for k,v in iter(p6vect.vocabulary_.items()) if v in nonzero_idx }
+#        print("vocab ", p6vect.vocabulary_)
+        #p6vect.vocabulary_ = reduceVocab(p6vect.vocabulary_, nonzero_idx)
+        p6L1train_data = p6vect.transform(train_data)
+#        p6LRclfL2 = LogisticRegression(penalty='l2', C=c, tol=0.01)
+#        p6LRclfL2.fit(p6L1train_data, train_labels)
+
+        # Get accuracy
+#        p6dev_data = p6vect.transform(dev_data)
+#        _pred = p6LRclfL2.predict(p6dev_data)
+#        f1 = metrics.f1_score(dev_labels, _pred)
+#        f1score.append( f1 )
+        
+    return vocabsize, f1score
+    
+    
+    
+#print(vocab)
+#p6LRclf.coef_[0]
+#print(p6LRprediction)
+#print("F1 score for Logistic Regression algorithm with L1 regularization is ", metrics.f1_score(dev_labels, p6LRprediction, average='macro'))
+
+    ### STUDENT END ###
+cvalues = [0.1, 1, 10]
+vocabsize, f1score = P6(cvalues)
+
+# Make a plot showing accuracy of the re-trained model vs. the vocabulary size
+#max_c = max(cvalues)
+#fig, ax = plt.subplots(1, figsize=(10,5))
+#ax.bar(np.log10(vocabsize), f1score, width=.2)  # remove the log and  use horizontal bars
+#ax.set_title('F1-Score for different Vocabulary Sizes', size=20)
+#ax.set_xlabel('Vocabulary Size', size=15)
+#ax.set_ylabel('F1 Score', size=15)
+
+#plt.show()
+--------------------------------------------
+#def P7():
+    ### STUDENT START ###
+
+#http://scikit-learn.org/stable/auto_examples/applications/topics_extraction_with_nmf_lda.html#example-applications-topics-extraction-with-nmf-lda-py
+
+#Get the baseline F1
+categories = ['alt.atheism', 'talk.religion.misc', 'comp.graphics', 'sci.space']
+p7vectorizer = TfidfVectorizer()
+p7train_data = p7vectorizer.fit_transform(train_data)
+
+# Use the same vectorizer as the training data, so that the same vocabulary is used
+p7dev_data = p7vectorizer.transform(dev_data)
+
+P7LRclf = LogisticRegression(C=100)
+P7LRclf.fit(p7train_data,train_labels)
+P7LRprediction = P7LRclf.predict(p7dev_data)
+P7predicted_prob = P7LRclf.predict_proba(p7dev_data)
+
+#print((P7predicted_prob))
+
+# show the top 3 documents where the ratio R is largest
+R = [max(x)/x[dev_labels[i]] for i,x in enumerate(P7predicted_prob) ]
+documentindex = np.argsort(-np.array(R))[:3]
+
+for di in documentindex:
+    print("\nDocument {}".format(di))
+    print("Predicted Category: ", categories[P7LRprediction[di]])
+    print("Actual Category: ", categories[dev_labels[di]])
+    print(dev_data[di])
+    print("\n")
+
+#print(P7LRprediction)
+#print("Baseline F1 score for Logistic Regression algorithm is ", metrics.f1_score(dev_labels, P7LRprediction, average='macro'))
+    ### STUDENT END ###
+#P7()
